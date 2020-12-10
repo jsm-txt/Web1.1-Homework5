@@ -21,11 +21,12 @@ def plants_list():
 
     # TODO: Replace the following line with a database call to retrieve *all*
     # plants from the Mongo database's `plants` collection.
-    plants_data = ''
+    plants_data = mongo.db.plants.find()
 
     context = {
         'plants': plants_data,
     }
+    
     return render_template('plants_list.html', **context)
 
 @app.route('/about')
@@ -40,16 +41,19 @@ def create():
         # TODO: Get the new plant's name, variety, photo, & date planted, and 
         # store them in the object below.
         new_plant = {
-            'name': '',
-            'variety': '',
-            'photo_url': '',
-            'date_planted': ''
+            'name': request.form.get("plant_name"),
+            'variety': request.form.get("veriety"),
+            'photo_url': request.form.get("photo"),
+            'date_planted': request.form.get("date_planted")
         }
         # TODO: Make an `insert_one` database call to insert the object into the
         # database's `plants` collection, and get its inserted id. Pass the 
         # inserted id into the redirect call below.
+        result = mongo.db.plants.insert_one(new_plant)
+        plants_id = result.inserted_id
+        
 
-        return redirect(url_for('detail', plant_id=''))
+        return redirect(url_for('detail', plant_id= plants_id))
 
     else:
         return render_template('create.html')
@@ -60,13 +64,16 @@ def detail(plant_id):
 
     # TODO: Replace the following line with a database call to retrieve *one*
     # plant from the database, whose id matches the id passed in via the URL.
-    plant_to_show = ''
+    print(plant_id)
+    plant_to_show = mongo.db.plants.find_one({'_id': ObjectId(plant_id)})
+    print(plant_to_show)
+    
 
     # TODO: Use the `find` database operation to find all harvests for the
     # plant's id.
     # HINT: This query should be on the `harvests` collection, not the `plants`
     # collection.
-    harvests = ''
+    harvests = mongo.db.harvest.find()
 
     context = {
         'plant' : plant_to_show,
