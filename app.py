@@ -64,17 +64,17 @@ def detail(plant_id):
 
     # TODO: Replace the following line with a database call to retrieve *one*
     # plant from the database, whose id matches the id passed in via the URL.
-    print(plant_id)
+    
     plant_to_show = mongo.db.plants.find_one({'_id': ObjectId(plant_id)})
-    print(plant_to_show)
     
 
     # TODO: Use the `find` database operation to find all harvests for the
     # plant's id.
     # HINT: This query should be on the `harvests` collection, not the `plants`
     # collection.
-    harvests = mongo.db.harvest.find()
+    harvests = mongo.db.harvests.find({})
 
+    
     context = {
         'plant' : plant_to_show,
         'harvests': harvests
@@ -90,14 +90,19 @@ def harvest(plant_id):
     # TODO: Create a new harvest object by passing in the form data from the
     # detail page form.
     new_harvest = {
-        'quantity': '', # e.g. '3 tomatoes'
-        'date': '',
+        'quantity': request.form.get('harvested_amount'),
+        'date': request.form.get('date_planted'),
         'plant_id': plant_id
     }
-
+    
     # TODO: Make an `insert_one` database call to insert the object into the 
     # `harvests` collection of the database.
+    mongo.db.harvests.insert_one(new_harvest)
 
+    # harvests = mongo.db.plant.harvests.find({'_id': ObjectId(plant_id)})
+    # print(harvests)
+    # for item in harvests:
+    #     print(item)
     return redirect(url_for('detail', plant_id=plant_id))
 
 @app.route('/edit/<plant_id>', methods=['GET', 'POST'])
